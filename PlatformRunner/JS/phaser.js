@@ -10,7 +10,6 @@ function preload() {
     game.load.spritesheet('player', 'Sprites/dude.png', 32, 48);
 }
 
-var player;
 var platforms;
 var score = 0;
 var scoreText;
@@ -67,7 +66,7 @@ scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'})
 
 function update() {
     //  Collide the player with the platforms
-    game.physics.arcade.collide(player, platforms, stars);
+    game.physics.arcade.collide(player, platforms);
 
     cursors = game.input.keyboard.createCursorKeys();
 
