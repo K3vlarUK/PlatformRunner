@@ -10,6 +10,7 @@ function preload() {
     game.load.spritesheet('player', 'Sprites/dude.png', 32, 48);
 }
 
+var player;
 var platforms;
 var score = 0;
 var scoreText;
@@ -59,7 +60,7 @@ function create() {
 
     var collect = stars.create(700, 390, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
 scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
@@ -101,7 +102,14 @@ function update() {
         player.body.velocity.y = -250;
     }
 
-    game.physics.arcade.collide(platforms);
+    game.physics.arcade.collide(stars, platforms);
 
-    game.physics.arcade.overlap(player, stars, null, this);
+    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+
+    function collectStar(player, star){
+        star.kill();
+
+        score += 10;
+        scoreText.text = 'Score: ' + score;
+    }
 }
