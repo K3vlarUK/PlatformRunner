@@ -62,6 +62,22 @@ function create() {
     collect.body.gravity.y = 100;
     collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
+    collect = stars.create(100, 290, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(650, 190, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(50, 90, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(770, -10, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
 scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
 
