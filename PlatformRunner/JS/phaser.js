@@ -93,6 +93,12 @@ function create() {
     collect.body.gravity.y = 100;
     collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
+    gOver = game.add.group();
+    gOver.enableBody = true;
+    var finish = gOver.create(1930, 100, 'finish');
+    finish.body.gravity.y = 100;
+    finish.scale.setTo(0.5,0.5);
+
 scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
 
@@ -137,6 +143,7 @@ function update() {
     background.tilePosition.y = -game.camera.y;
 
     game.physics.arcade.collide(stars, platforms);
+    game.physics.arcade.collide(gOver, platforms);
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
 
