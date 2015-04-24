@@ -9,14 +9,24 @@ function preload() {
     game.load.image('platform', 'Images/platform.png');
     game.load.image('star', 'Images/star.png');
     game.load.image('finish', 'Images/finish.png');
+    game.load.image('enemy', 'Images/enemy.png');
     game.load.spritesheet('player', 'Sprites/dude.png', 32, 48);
 }
 
 var player;
+var enemySpeed = 50;
 var platforms;
 var score = 0;
 var scoreText;
 var background;
+
+function addPlatform(PosX, PosY, asset){
+    ledge = game.add.sprite(PosX, PosY, asset);
+    game.physics.enable(ledge, Phaser.Physics.ARCADE);
+    ledge.body.allowGravity = false;
+    ledge.body.immovable = true;
+    platforms.add(ledge);
+}
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE); //Enabling Physics
@@ -27,7 +37,6 @@ function create() {
     background.fixedToCamera = true;
 
     platforms = game.add.group();   //Platform group
-
     platforms.enableBody = true;    //Enable physics for the group
 
     var ground = platforms.create(0, game.world.height - 64, 'ground');     //The Ground
@@ -39,22 +48,14 @@ function create() {
     ground.body.immovable = true;
 
 //Platforms
-    var ledge = platforms.create(400, 425, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(700, 310, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(900, 190, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(900, 425, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(1080, 310, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(1400, 425, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(1600, 310, 'platform');
-    ledge.body.immovable = true;
-    ledge = platforms.create(1850, 190, 'platform');
-    ledge.body.immovable = true;
+    addPlatform(400, 425, 'platform');
+    addPlatform(700, 310, 'platform');
+    addPlatform(900, 190, 'platform');
+    addPlatform(900, 425, 'platform');
+    addPlatform(1080, 310, 'platform');
+    addPlatform(1400, 425, 'platform');
+    addPlatform(1600, 310, 'platform');
+    addPlatform(1850, 190, 'platform');
 
     player = game.add.sprite(32, game.world.height - 150, 'player');    //The player
     game.physics.arcade.enable(player);     //Player Physics
@@ -69,6 +70,11 @@ function create() {
     player.animations.add('right', [5, 6, 7, 8], 10, true);
 
     game.camera.follow(player);
+
+    var enemy = new Enemy(game, 400,300, 1, enemySpeed);
+    enemy.scale.setTo(0.5, 0.5);
+    enemy.body.gravity.y = 300;
+    game.add.existing(enemy);
 
     stars = game.add.group();
     stars.enableBody = true;
@@ -95,9 +101,10 @@ function create() {
 
     gOver = game.add.group();
     gOver.enableBody = true;
-    var finish = gOver.create(1930, 100, 'finish');
+    var finish = gOver.create(1920, 100, 'finish');
     finish.body.gravity.y = 100;
     finish.scale.setTo(0.5,0.5);
+
 
 scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
@@ -152,5 +159,26 @@ function update() {
 
         score += 10;
         scoreText.text = 'Score: ' + score;
+    }
+}
+
+//Enemies
+Enemy = function (game, x, y, direction, speed){
+    Phaser.Sprite.call(this, game, x, y, 'enemy');
+    game.physics.enable(this, Phaser.Physics.ARCADE);
+    this.xSpeed = direction * speed;
+};
+
+Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.update = function(){
+    game.physics.arcade.collide(this, platforms, moveEnemy);
+    this.body.velocity.x = this.xSpeed;
+};
+
+function moveEnemy(enemy, ledge){
+    if(enemy.xSpeed > 0 && enemy.x > ledge.x + ledge.width / 2 || enemy.xSpeed < 0 && enemy.x < ledge.x - ledge.width / 2){
+        enemy.xSpeed *= -1;
     }
 }
