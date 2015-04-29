@@ -1,63 +1,49 @@
 /**
  * Created by b00237669 on 03/04/2015.
  */
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-page', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'Game', { preload: preload, create: create, update: update });
 
 function preload() {
     game.load.image('sky', 'Images/sky.png');
-    game.load.image('ground', 'Images/ground.png');
-    game.load.image('platform', 'Images/platform.png');
+    game.load.image('ground', 'Images/platform.png');
     game.load.image('star', 'Images/star.png');
-    game.load.image('finish', 'Images/finish.png');
-    game.load.image('enemy', 'Images/enemy.png');
     game.load.spritesheet('player', 'Sprites/dude.png', 32, 48);
 }
 
 var player;
-var enemySpeed = 50;
 var platforms;
 var score = 0;
-var lives = 3;
-var background;
-
-function addPlatform(PosX, PosY, asset){
-    ledge = game.add.sprite(PosX, PosY, asset);
-    game.physics.enable(ledge, Phaser.Physics.ARCADE);
-    ledge.body.allowGravity = false;
-    ledge.body.immovable = true;
-    platforms.add(ledge);
-}
+var scoreText;
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE); //Enabling Physics
 
-    game.world.setBounds(0, 0, 2000, 600);
-
-    background = game.add.tileSprite(0, 0, 800, 600, 'sky');
-    background.fixedToCamera = true;
+    game.add.sprite(0, 0, 'sky'); //Simple Background
 
     platforms = game.add.group();   //Platform group
+
     platforms.enableBody = true;    //Enable physics for the group
 
     var ground = platforms.create(0, game.world.height - 64, 'ground');     //The Ground
-    ground.scale.setTo(3.5,1);    //Scale the ground
+
+    ground.scale.setTo(2,2);    //Scale the ground
+
     ground.body.immovable = true;
 
-    ground = platforms.create(game.world.width/2, game.world.height - 64, 'ground');
-    ground.scale.setTo(3.5,1);    //Scale the ground
-    ground.body.immovable = true;
-
-//Platforms
-    addPlatform(400, 425, 'platform');
-    addPlatform(700, 310, 'platform');
-    addPlatform(900, 190, 'platform');
-    addPlatform(900, 425, 'platform');
-    addPlatform(1080, 310, 'platform');
-    addPlatform(1400, 425, 'platform');
-    addPlatform(1600, 310, 'platform');
-    addPlatform(1850, 190, 'platform');
+    //Platforms
+    var ledge = platforms.create(400, 450, 'ground');
+    ledge.body.immovable = true;
+    ledge = platforms.create(-100, 350, 'ground');
+    ledge.body.immovable = true;
+    ledge = platforms.create(300, 250, 'ground');
+    ledge.body.immovable = true;
+    ledge = platforms.create(-50, 150, 'ground');
+    ledge.body.immovable = true;
+    ledge = platforms.create(400, 50, 'ground');
+    ledge.body.immovable = true;
 
     player = game.add.sprite(32, game.world.height - 150, 'player');    //The player
+
     game.physics.arcade.enable(player);     //Player Physics
 
     //  Player physics properties.
@@ -69,54 +55,30 @@ function create() {
     player.animations.add('left', [0, 1, 2, 3], 10, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
 
-    game.camera.follow(player);
-
-    var enemy = new Enemy(game, 400,385, 1, enemySpeed);
-    enemy.scale.setTo(0.5, 0.5);
-    enemy.body.gravity.y = 300;
-    game.add.existing(enemy);
-
-    enemy = new Enemy(game, 900, 385, 1 , enemySpeed);
-    enemy.scale.setTo(0.5, 0.5);
-    enemy.body.gravity.y = 300;
-    game.add.existing(enemy);
-
-    enemy = new Enemy(game, 1050, 110, 1 , enemySpeed);
-    enemy.scale.setTo(0.5, 0.5);
-    enemy.body.gravity.y = 300;
-    game.add.existing(enemy);
-
-    enemy = new Enemy(game, 1550, 385, 1 , enemySpeed);
-    enemy.scale.setTo(0.5, 0.5);
-    enemy.body.gravity.y = 300;
-    game.add.existing(enemy);
-
     stars = game.add.group();
     stars.enableBody = true;
 
-    var collect = stars.create(800, 390, 'star');
+    var collect = stars.create(700, 390, 'star');
     collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(550, 400, 'star');
+    collect = stars.create(100, 290, 'star');
     collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(1000, 190, 'star');
+    collect = stars.create(650, 190, 'star');
     collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(1100, 50, 'star');
+    collect = stars.create(50, 90, 'star');
     collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(1250, 90, 'star');
+    collect = stars.create(770, -10, 'star');
     collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(1670, 10, 'star');
-    collect.body.gravity.y = 100;
-
-    gOver = game.add.group();
-    gOver.enableBody = true;
-    var finish = gOver.create(1920, 100, 'finish');
-    finish.body.gravity.y = 100;
-    finish.scale.setTo(0.5,0.5);
+scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
 
 function update() {
@@ -153,51 +115,17 @@ function update() {
     //Allow the player to jump if touching ground
     if(cursors.up.isDown && player.body.touching.down)
     {
-        player.body.velocity.y = -280;
+        player.body.velocity.y = -250;
     }
 
-    background.tilePosition.x = -game.camera.x;
-    background.tilePosition.y = -game.camera.y;
-
     game.physics.arcade.collide(stars, platforms);
-    game.physics.arcade.collide(gOver, platforms);
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
-    game.physics.arcade.overlap(player, gOver, gameOver, null, this);
 
     function collectStar(player, star){
         star.kill();
 
         score += 10;
-    }
-
-    function gameOver(player, gOver){
-        gOver.kill();
-    }
-}
-
-function render (){
-    game.debug.text('score: ' + score, 16, 16);
-    game.debug.text('lives: ' + lives, 700, 16);
-}
-
-//Enemies
-Enemy = function (game, x, y, direction, speed){
-    Phaser.Sprite.call(this, game, x, y, 'enemy');
-    game.physics.enable(this, Phaser.Physics.ARCADE);
-    this.xSpeed = direction * speed;
-};
-
-Enemy.prototype = Object.create(Phaser.Sprite.prototype);
-Enemy.prototype.constructor = Enemy;
-
-Enemy.prototype.update = function(){
-    game.physics.arcade.collide(this, platforms, moveEnemy);
-    this.body.velocity.x = this.xSpeed;
-};
-
-function moveEnemy(enemy, ledge){
-    if(enemy.xSpeed > 0 && enemy.x > ledge.x + ledge.width * 0.8 || enemy.xSpeed < 0 && enemy.x < ledge.x - ledge.width * 0.03){
-        enemy.xSpeed *= -1;
+        scoreText.text = 'Score: ' + score;
     }
 }
