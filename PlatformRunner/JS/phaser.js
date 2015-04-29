@@ -1,7 +1,7 @@
 /**
  * Created by b00237669 on 03/04/2015.
  */
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-page', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-page', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
     game.load.image('sky', 'Images/forest.jpg');
@@ -17,7 +17,7 @@ var player;
 var enemySpeed = 50;
 var platforms;
 var score = 0;
-var scoreText;
+var lives = 3;
 var background;
 
 function addPlatform(PosX, PosY, asset){
@@ -71,7 +71,22 @@ function create() {
 
     game.camera.follow(player);
 
-    var enemy = new Enemy(game, 400,300, 1, enemySpeed);
+    var enemy = new Enemy(game, 400,385, 1, enemySpeed);
+    enemy.scale.setTo(0.5, 0.5);
+    enemy.body.gravity.y = 300;
+    game.add.existing(enemy);
+
+    enemy = new Enemy(game, 900, 385, 1 , enemySpeed);
+    enemy.scale.setTo(0.5, 0.5);
+    enemy.body.gravity.y = 300;
+    game.add.existing(enemy);
+
+    enemy = new Enemy(game, 1050, 110, 1 , enemySpeed);
+    enemy.scale.setTo(0.5, 0.5);
+    enemy.body.gravity.y = 300;
+    game.add.existing(enemy);
+
+    enemy = new Enemy(game, 1550, 385, 1 , enemySpeed);
     enemy.scale.setTo(0.5, 0.5);
     enemy.body.gravity.y = 300;
     game.add.existing(enemy);
@@ -79,34 +94,29 @@ function create() {
     stars = game.add.group();
     stars.enableBody = true;
 
-    var collect = stars.create(700, 390, 'star');
+    var collect = stars.create(800, 390, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(100, 290, 'star');
+    collect = stars.create(550, 400, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(650, 190, 'star');
+    collect = stars.create(1000, 190, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(50, 90, 'star');
+    collect = stars.create(1100, 50, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-    collect = stars.create(770, -10, 'star');
+    collect = stars.create(1250, 90, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(1670, 10, 'star');
+    collect.body.gravity.y = 100;
 
     gOver = game.add.group();
     gOver.enableBody = true;
     var finish = gOver.create(1920, 100, 'finish');
     finish.body.gravity.y = 100;
     finish.scale.setTo(0.5,0.5);
-
-
-scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
 
 function update() {
@@ -153,13 +163,21 @@ function update() {
     game.physics.arcade.collide(gOver, platforms);
 
     game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, gOver, gameOver, null, this);
 
-    function collectStar(player, star){
-        star.kill();
-
-        score += 10;
-        scoreText.text = 'Score: ' + score;
+    function loseLife(player, enemy){
+        enemy.kill();
+        lives -= 1;
     }
+
+    function gameOver(player, gOver){
+        gOver.kill();
+    }
+}
+
+function render (){
+    game.debug.text('score: ' + score, 16, 16);
+    game.debug.text('lives: ' + lives, 700, 16);
 }
 
 //Enemies
@@ -178,7 +196,7 @@ Enemy.prototype.update = function(){
 };
 
 function moveEnemy(enemy, ledge){
-    if(enemy.xSpeed > 0 && enemy.x > ledge.x + ledge.width / 2 || enemy.xSpeed < 0 && enemy.x < ledge.x - ledge.width / 2){
+    if(enemy.xSpeed > 0 && enemy.x > ledge.x + ledge.width * 0.8 || enemy.xSpeed < 0 && enemy.x < ledge.x - ledge.width * 0.03){
         enemy.xSpeed *= -1;
     }
 }
