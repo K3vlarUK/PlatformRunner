@@ -60,14 +60,30 @@ function create() {
 
     var collect = stars.create(700, 390, 'star');
     collect.body.gravity.y = 100;
-    collect.body.bounce.y = 0;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
 
-scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
+    collect = stars.create(100, 290, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(650, 190, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(50, 90, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    collect = stars.create(770, -10, 'star');
+    collect.body.gravity.y = 100;
+    collect.body.bounce.y = 0.7 + Math.random() * 0.2;
+
+    scoreText = game.add.text(16, 16, 'score: 0', { fontsize: '32px', fill: '#000'});
 }
 
 function update() {
     //  Collide the player with the platforms
-    game.physics.arcade.collide(player, platforms, stars);
+    game.physics.arcade.collide(player, platforms);
 
     cursors = game.input.keyboard.createCursorKeys();
 
@@ -102,7 +118,14 @@ function update() {
         player.body.velocity.y = -250;
     }
 
-    game.physics.arcade.collide(platforms);
+    game.physics.arcade.collide(stars, platforms);
 
-    game.physics.arcade.overlap(player, stars, null, this);
+    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+
+    function collectStar(player, star){
+        star.kill();
+
+        score += 10;
+        scoreText.text = 'Score: ' + score;
+    }
 }
